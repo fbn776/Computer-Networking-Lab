@@ -1,58 +1,57 @@
 #include <stdio.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 
-#define BUFF_SIZE 1024
+void chat(int conn_fd) {
+    while (1) {
+        char buffer[100] = {0};
+        read(conn_fd, buffer, sizeof buffer);
+        printf("Client: %s\n", buffer);
+
+        memset(buffer, 0, sizeof buffer);
+        printf("Msg: ");
+        scanf(" %[^\n]", buffer);
+        write(conn_fd, buffer, strlen(buffer) + 1);
+
+        if (strcmp(buffer, "exit") == 0) {
+            close(conn_fd);
+            return;
+        }
+    }
+}
 
 int main() {
-    int PORT;
-    struct sockaddr_in server_addr;
-    int server_fd, client_fd;
-    int addr_len = sizeof(server_addr);
+    struct sockaddr_in server, client;
+    int PORT = 7776, len;
 
-    printf("Enter PORT: ");
-    scanf(" %d", &PORT);
 
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    server.sin_port = htons(PORT);
 
-    if (server_fd == -1) {
-        perror("SOCKET");
-        exit(1);
+
+
+    if (bind(sock_fd, (struct sockaddr *) &server, sizeof server) < 0) {
+        perror("BIND failed");
+        return 1;
     }
 
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(PORT);
+    printf("Server listening on PORT: %d", PORT);
 
-    if (bind(server_fd, (struct sockaddr*) &server_addr, addr_len) < 0) {
-        perror("BIND");
-        exit(1);
+
+    if (listen(sock_fd, 5) != 0) {
+        perror("LISTEN failed");
+        return 1;
     }
 
-    if (listen(server_fd, 0) < 0) {
-        perror("LISTEN");
-        exit(1);
-    }
 
-    printf("Server started listening on PORT %d\n", PORT);
+    len = sizeof client;
+    int conn_fd = accept(sock_fd, (struct sockaddr *) &client, (socklen_t *) &len);
 
-    client_fd = accept(server_fd, (struct sockaddr*) &server_addr, (socklen_t *) &addr_len);
+    chat(conn_fd);
 
-    if (client_fd < 0) {
-        perror("ACCEPT");
-        exit(1);
-    }
-
-    char buffer[BUFF_SIZE] = {0};
-    read(client_fd, buffer, BUFF_SIZE);
-
-    printf("CLIENT %s\n", buffer);
-
-    char *resp = "Hello from server";
-    send(client_fd, resp, strlen(resp), 0);
-
-    close(client_fd);
-    close(server_fd);
+    close(sock_fd);
 }

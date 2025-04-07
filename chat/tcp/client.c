@@ -1,48 +1,42 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define BUFFER_SIZE 1024
+
+void chat(int conn_fd) {
+    while (1) {
+        char buffer[100];
+        printf("Msg: ");
+        scanf(" %[^\n]", buffer);
+        write(conn_fd, buffer, strlen(buffer));
+
+        memset(buffer, 0, sizeof buffer);
+        read(conn_fd, buffer, sizeof buffer);
+        printf("Server: %s\n", buffer);
+
+        if (strcmp(buffer, "exit") == 0) {
+            return;
+        }
+    }
+}
 
 int main() {
-    int PORT;
-    int sock;
-    struct sockaddr_in server_address;
-    char buffer[BUFFER_SIZE] = {0};
+    int PORT = 7776;
+    struct sockaddr_in server;
+    int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-    printf("Enter PORT: ");
-    scanf(" %d", &PORT);
+    memset(&server, 0, sizeof(server));
+    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    server.sin_family = AF_INET;
+    server.sin_port = htons(PORT);
 
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        perror("Socket creation failed");
-        exit(EXIT_FAILURE);
+    if (connect(sock_fd, (struct sockaddr *) &server, sizeof server) != 0) {
+        perror("CONNECT failed");
+        return 1;
     }
 
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(PORT);
-
-    // 2. Convert IP address
-    if (inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr) <= 0) {
-        perror("Invalid address");
-        exit(EXIT_FAILURE);
-    }
-
-    if (connect(sock, (struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
-        perror("Connection failed");
-        exit(EXIT_FAILURE);
-    }
-
-    char *message = "Hello from client!";
-    send(sock, message, strlen(message), 0);
-
-    read(sock, buffer, BUFFER_SIZE);
-    printf("Server: %s\n", buffer);
-
-    // 6. Close socket
-    close(sock);
-
-    return 0;
+    chat(sock_fd);
+    close(sock_fd);
 }
