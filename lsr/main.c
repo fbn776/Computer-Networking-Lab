@@ -2,9 +2,7 @@
 
 int main() {
     int count, src_router, i, j, k, w, v, min;
-    int cost_matrix[100][100], dist[100], last[100];
-
-    int flag[100];
+    int cost_matrix[100][100], dist[100], last[100], flag[100];
     printf("\nEnter the no of routers: ");
     scanf("%d", &count);
 

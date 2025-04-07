@@ -23,7 +23,7 @@ void chat(int conn_fd) {
 }
 
 int main() {
-    int PORT = 7776;
+    int PORT = 7777;
     struct sockaddr_in server;
     int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 
