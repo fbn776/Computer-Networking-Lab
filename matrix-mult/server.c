@@ -6,8 +6,8 @@
 #include <arpa/inet.h>
 
 typedef struct {
-    int n;
-    int m;
+    int row;
+    int col;
     int arr[10][10];
 } Matrix;
 
@@ -31,12 +31,12 @@ int main() {
     read(conn_fd, &B, sizeof B);
     printf("Got matrix B\n");
 
-    C.n = A.n;
-    C.m = B.m;
-    for (int i = 0; i < A.m; i++) {
-        for (int j = 0; j < B.n; j++) {
+    C.row = A.row;
+    C.col = B.col;
+    for (int i = 0; i < A.row; i++) {
+        for (int j = 0; j < B.col; j++) {
             C.arr[i][j] = 0;
-            for (int k = 0; k < A.n; k++) {
+            for (int k = 0; k < A.col; k++) {
                 C.arr[i][j] += A.arr[i][k] * B.arr[k][j];
             }
         }
@@ -44,8 +44,8 @@ int main() {
 
     write(conn_fd, &C, sizeof C);
     printf("Matrix C:\n");
-    for (int i = 0; i < C.n; i++) {
-        for (int j = 0; j < C.m; j++) {
+    for (int i = 0; i < C.row; i++) {
+        for (int j = 0; j < C.col; j++) {
             printf("%d ", C.arr[i][j]);
         }
         printf("\n");
