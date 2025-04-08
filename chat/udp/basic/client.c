@@ -10,19 +10,19 @@
 #define SA struct sockaddr
 #define SAI struct sockaddr_in
 
-void chat(int sockfd,SAI server) {
+void chat(int sockfd,SAI* server) {
     printf("\nClient ready....\n");
     char buff[MAX];
-    int len = sizeof(server);
+    int len = sizeof(*server);
     while (1) {
         bzero(buff, sizeof(buff));
         printf("Msg:");
         fgets(buff, MAX, stdin);
 
-        sendto(sockfd, buff, sizeof(buff), 0, (SA *) &server, len);
+        sendto(sockfd, buff, sizeof(buff), 0, (SA *) server, len);
 
         bzero(buff, sizeof(buff));
-        recvfrom(sockfd, buff, sizeof(buff), 0, (SA *) &server, (socklen_t *) &len);
+        recvfrom(sockfd, buff, sizeof(buff), 0, (SA *) server, (socklen_t *) &len);
         printf("Server: %s\n", buff);
         if (strncmp(buff, "exit", 4) == 0) {
             printf("Client Exit...\n");
@@ -36,10 +36,10 @@ int main() {
     int sockfd;
     sockfd = socket(AF_INET,SOCK_DGRAM, 0);
     server.sin_family = AF_INET;
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    inet_pton(AF_INET, "127.0.0.1", &server.sin_addr);
     server.sin_port = htons(PORT);
 
-    chat(sockfd, server);
+    chat(sockfd, &server);
     close(sockfd);
     return 0;
 }

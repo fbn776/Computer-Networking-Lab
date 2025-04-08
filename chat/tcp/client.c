@@ -28,7 +28,7 @@ int main() {
     int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 
     memset(&server, 0, sizeof(server));
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    inet_pton(AF_INET, "127.0.0.1", &server.sin_addr);
     server.sin_family = AF_INET;
     server.sin_port = htons(PORT);
 

@@ -60,26 +60,14 @@ int main() {
 
     // Create server socket
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd == -1) {
-        perror("Socket creation failed");
-        exit(1);
-    }
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(8080);
 
-    // Bind
-    if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        perror("Bind failed");
-        exit(1);
-    }
+    bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
 
-    // Listen
-    if (listen(server_fd, MAX_CLIENTS) < 0) {
-        perror("Listen failed");
-        exit(1);
-    }
+    listen(server_fd, MAX_CLIENTS);
 
     printf("Server is listening on port 8080...\n");
 

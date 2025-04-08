@@ -12,8 +12,8 @@ int main() {
     for (i = 0; i < count; i++) {
         for (j = 0; j < count; j++) {
             scanf("%d", &cost_matrix[i][j]);
-            if (cost_matrix[i][j] == -1) // Handle no direct path
-                cost_matrix[i][j] = INT_MAX;
+            // if (cost_matrix[i][j] == -1) // Handle no direct path
+            //     cost_matrix[i][j] = INT_MAX;
         }
     }
 
@@ -23,7 +23,7 @@ int main() {
     // Initialize distance and flag arrays
     for (v = 0; v < count; v++) {
         flag[v] = 0;
-        last[v] = src_router;
+        // last[v] = src_router;
         dist[v] = cost_matrix[src_router][v];
     }
 

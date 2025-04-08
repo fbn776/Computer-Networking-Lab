@@ -21,11 +21,12 @@ int main(){
 
 	bzero(buffer,MAX);
 
-	if((connect(sockfd,(struct sockaddr*)& serv_addr,sizeof(serv_addr)))==0)
-        printf("Connected with server..\n");
+	connect(sockfd,(struct sockaddr*)& serv_addr,sizeof(serv_addr));
+
 	printf("Enter the no of message:");
 	while((buffer[n++]=getchar())!='\n');
 	write(sockfd,buffer,MAX);
+
 	int no= atoi(buffer);
 	int i =0;
 	while(1){
